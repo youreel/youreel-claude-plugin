@@ -9,6 +9,9 @@
   },
   "homepage": "https://youreel.app",
   "privacyPolicyUrl": "https://youreel.app/privacy",
+  "termsOfServiceUrl": "https://youreel.app/terms",
+  "documentationUrl": "https://github.com/youreel/youreel-claude-plugin#readme",
+  "supportUrl": "mailto:hello@youreel.app",
   "repository": "https://github.com/youreel/youreel-claude-plugin",
   "license": "MIT",
   "keywords": ["instagram", "analytics", "reels", "creators"]
