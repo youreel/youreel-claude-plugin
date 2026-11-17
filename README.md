@@ -15,7 +15,7 @@ Instagram is the only network youreel supports.
 
 ## Connect and disconnect
 
-The plugin adds the youreel connector (`https://youreel.app/api/mcp`). The first time
+The plugin adds the youreel connector (`https://www.youreel.app/api/mcp`). The first time
 Claude uses it, you sign in to youreel and approve access. The plugin holds no
 password, key or token.
 

@@ -2,7 +2,7 @@
   "mcpServers": {
     "youreel": {
       "type": "http",
-      "url": "https://youreel.app/api/mcp"
+      "url": "https://www.youreel.app/api/mcp"
     }
   }
 }
