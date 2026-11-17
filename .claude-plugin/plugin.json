@@ -1,0 +1,15 @@
+{
+  "name": "youreel",
+  "version": "0.1.0",
+  "description": "Ask Claude about your Instagram. Get a daily update, a weekly or monthly report, compare yourself with accounts you name, and see which of your latest reels worked better. Claude reads your real numbers from youreel and can't post or change anything.",
+  "author": {
+    "name": "youreel",
+    "email": "hello@youreel.app",
+    "url": "https://youreel.app"
+  },
+  "homepage": "https://youreel.app",
+  "privacyPolicyUrl": "https://youreel.app/privacy",
+  "repository": "https://github.com/youreel/youreel-claude-plugin",
+  "license": "MIT",
+  "keywords": ["instagram", "analytics", "reels", "creators"]
+}
