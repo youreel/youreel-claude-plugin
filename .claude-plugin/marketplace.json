@@ -1,0 +1,15 @@
+{
+  "name": "youreel",
+  "owner": {
+    "name": "youreel",
+    "email": "hello@youreel.app",
+    "url": "https://youreel.app"
+  },
+  "plugins": [
+    {
+      "name": "youreel",
+      "source": "./",
+      "description": "Ask Claude about your Instagram, and the public X account and Telegram channel you monitor in youreel."
+    }
+  ]
+}

@@ -15,6 +15,21 @@ Claude answers with real numbers from youreel, and tells you when there isn't en
   the monitor page in youreel.
 - A Claude app that supports plugins.
 
+## Install
+
+In Claude Code, run:
+
+```
+/plugin install youreel --marketplace youreel/youreel-claude-plugin
+```
+
+On Claude Code older than 2.1.275, add the marketplace first, then install:
+
+```
+/plugin marketplace add youreel/youreel-claude-plugin
+/plugin install youreel@youreel
+```
+
 ## Connect and disconnect
 
 The plugin adds the youreel connector (`https://www.youreel.app/api/mcp`). The first time
