@@ -1,7 +1,7 @@
 {
   "name": "youreel",
-  "version": "0.1.0",
-  "description": "Ask Claude about your Instagram. Get a daily update, a weekly or monthly report, compare yourself with accounts you name, and see which of your latest reels worked better. Claude reads your real numbers from youreel and can't post or change anything.",
+  "version": "0.2.0",
+  "description": "Ask Claude about your Instagram, and the public X account and Telegram channel you monitor in youreel. Get a daily update and a weekly or monthly report across all three, see which of your latest reels or posts worked better, and compare yourself with Instagram accounts you name. Claude reads real numbers from youreel and can't post or change anything.",
   "author": {
     "name": "youreel",
     "email": "hello@youreel.app",
@@ -14,5 +14,5 @@
   "supportUrl": "mailto:hello@youreel.app",
   "repository": "https://github.com/youreel/youreel-claude-plugin",
   "license": "MIT",
-  "keywords": ["instagram", "analytics", "reels", "creators"]
+  "keywords": ["instagram", "x", "twitter", "telegram", "analytics", "reels", "creators"]
 }

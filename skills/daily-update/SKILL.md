@@ -1,28 +1,32 @@
 ---
 name: daily-update
 description: >-
-  A short daily overview of the user's own Instagram account from youreel: the
-  net follower change since the day before, the last complete day's reach as of
-  the newest capture against the capture before it, posts published since the
-  day before, and which of the recent reels it checks gained the most views in
-  their last measured day. Use this whenever the user asks for a daily
-  update, a daily overview, "what changed since yesterday", "how did yesterday
-  go", "anything new on my Instagram today", "which reel is growing fastest right
-  now", or a morning check-in, even if they don't say "daily". Needs the youreel
-  connector. Not for a weekly or monthly report (use account-report), not for
-  ranking a set of reels overall (use reel-audit), and not for other people's
+  A short daily overview from youreel of the user's Instagram and of the X
+  account and Telegram channel they monitor in youreel: the net follower or
+  subscriber change since the day before, Instagram's last complete day of reach,
+  posts published since the day before, and which recent reels or posts gained
+  the most views in their last measured day. Use this whenever the user asks for
+  a daily update, a daily overview, "what changed since yesterday", "how did
+  yesterday go", "anything new on my Instagram today", "how did my X do
+  yesterday", "which reel or post is growing fastest right now", or a morning
+  check-in, even if they don't say "daily". Needs the youreel connector. Not for
+  a weekly or monthly report (use account-report), not for ranking a set of
+  reels or posts overall (use post-audit), and not for other people's Instagram
   accounts (use compare-accounts).
 ---
 
 # Daily update
 
-A quick read on what moved since yesterday, built only from what the youreel tools
-return. The reader checks it daily, so keep it short and say plainly when a day
-moved too little to mean anything. 1 day is a small sample.
+A quick read on what moved since yesterday on Instagram, X and Telegram, built
+only from what the youreel tools return. If the user asks about 1 network only,
+cover only that one. The reader checks it daily, so keep it short and say plainly
+when a day moved too little to mean anything. 1 day is a small sample.
 
 What this skill doesn't cover: likes, saves, shares or comments gained since
-yesterday. The tools return those only as current totals, with no day-by-day
-history. If the user asks, say youreel doesn't show that day by day yet.
+yesterday. On Instagram the tools return those only as current totals. If the
+user asks, say youreel doesn't show that day by day yet. On X and Telegram,
+`get_x_post` and `get_telegram_post` return every count per day, so answer from
+there when the user asks about 1 post.
 
 ## 1. Read the definitions
 
@@ -37,7 +41,8 @@ on the data, not the clock. Call `get_my_account` (for the handle), then
 `get_my_trends` with `weeks: 1`. The **update day** is the date of the newest point
 in `followers.points`. If there are no follower points, use the newest date in
 `reach.points`. If neither has a point, say youreel has no daily data for the
-account yet and stop.
+Instagram account yet, go to section 5, and write only the X and Telegram
+sections.
 
 If you know today's date and the update day is more than 1 day before it, say how
 old the newest data is.
@@ -55,8 +60,9 @@ old the newest data is.
    newest first, passing its `id` as `contentId`. Stop at 15 reels so the update
    stays quick, and say how many older ones you left out.
 
-Use only these tools. If a call fails, say which one and what is missing as a
-result, rather than filling the gap.
+Use only these tools for the Instagram part (section 5 adds the X and Telegram
+tools). If a call fails, say which one and what is missing as a result, rather
+than filling the gap.
 
 ## 4. Work out the numbers
 
@@ -109,7 +115,93 @@ many reels you didn't check. List the ones you checked but couldn't compare, and
 why, in 1 line. When the top reels gained similar amounts, say they're close
 rather than naming 1 as fastest.
 
-## 5. Write the update
+## 5. X and Telegram
+
+The same update for the X account and the Telegram channel the user monitors in
+youreel.
+
+Call `get_x_account` and `get_telegram_channel` with no `handle` or `username`
+and `limit: 100`. If the user asked about 1 network, call only that one. Each network has its own **update day**: the newest date in its
+`followerSeries` or `subscriberSeries`. Posts come newest first. Repeat with
+`offset` set to `nextOffset` until the oldest post returned is older than the
+growth window below, or `nextOffset` is null.
+
+**When a call fails.**
+
+- `not-found`: the user doesn't monitor an account on that network. If they asked
+  about that network, say so, and that they add one on the monitor page in youreel.
+  You can't add it for them. Otherwise leave that network out without comment.
+- Anything else: 1 line naming the tool and quoting its sentence.
+
+**Fetch state.** Every result has `fetching` (`ok` or `stopped`) and `reason`.
+
+- `pending`, or no `profile` and an empty series: youreel hasn't read the
+  account yet. Say so in 1 line and skip that network.
+- Any other `stopped`: say so first, in plain words, with how fresh the numbers
+  are: the newest series date for followers or subscribers, and the newest
+  `latest.captured_at` for posts.
+  - X `not_found`: X has no account with that handle.
+  - X `unavailable`: the account is protected or suspended.
+  - X `limit_user` or `limit_global`: youreel's monthly budget for reading X is
+    used up, so post counts stopped updating. Fetching starts again by the 1st of
+    next month (UTC) at the latest. Followers can still update: check the series
+    dates before calling them old.
+  - Telegram `not_found`: there's no public channel with that username, or it's
+    private.
+  - Telegram `session_missing`, `session_dead` or `flood`: a problem on youreel's
+    side. The user can't fix it and doesn't need to do anything.
+  - `error` on either network: youreel couldn't read it last time. Don't guess
+    why.
+
+**Reading the posts.**
+
+- Name a post by its `postedAt` date and the first words of `text`. X posts have
+  no link. A Telegram post's `text` can be empty: use its `url`, or only the date
+  when `url` is null.
+- X posts include the account's replies to other people, and the tool doesn't
+  mark which ones are replies. Say "posts and replies" when you count or rank
+  them. Reposts of other people's posts aren't included.
+- youreel refreshes an X post's counts for 5 days after it's posted. Older posts
+  keep their last counts: say "as of" their `latest.captured_at` date, and don't
+  measure growth on them.
+- Telegram `likes` is all reactions added together. `comments` null means
+  youreel has no comment count for that post. It isn't 0. If every post is null,
+  the channel has no comments section.
+- A `null` count, or a `null` `latest`, wasn't recorded. Write "not recorded",
+  never 0.
+
+**Wording.** Write about X and Telegram the way you write about Instagram, each
+network in its own section. youreel doesn't check who owns a monitored account,
+so say "your" only when the user calls it theirs. Otherwise name it: "@handle on
+X", "@channel on Telegram". Never mix networks in 1 table or ranking: X views
+are impressions as X counts them, Telegram views are Telegram's own count, and
+Instagram reach is a different measure again.
+
+**The numbers, for each network.**
+
+- **Followers (X) or subscribers (Telegram).** From the series (1 reading per UTC
+  day, the last one that day), take the newest point and the point before it,
+  with both dates and the difference. If the dates aren't consecutive, say how
+  many days it covers. With fewer than 2 points, say there's no change to show
+  yet. It's a net change, as on Instagram.
+- **New posts**: posts whose `postedAt` is on or after the start of the UTC day
+  before the update day, with their counts so far as of `latest.captured_at`.
+  X: views, likes, reposts, replies. Telegram: views, forwards, likes, comments.
+  They're still collecting, so don't rank them.
+- **Growing fastest**: the same idea as the reels above. Take the posts that
+  aren't new and were posted in the 5 days (X) or 14 days (Telegram) before the
+  update day. On X that's every post youreel still updates. On Telegram, 14 days
+matches the reels above. Newest first, call
+  `get_x_post` (with the post's `id` as `postId`) or `get_telegram_post` (with
+  its `messageId`) on up to 10 per network, and say how many you left out. From
+  `daily` (1 reading per UTC day), use a post only if its newest point is on the
+  update day or the day before, and there's a point for the day before that.
+  Views gained is the difference. Show the top 3 with both readings and dates.
+  When they're close, say so rather than naming 1 as fastest. List the posts you
+  checked but couldn't compare, and why, in 1 line (for example, only 1 reading
+  so far).
+
+## 6. Write the update
 
 Keep it readable in 30 seconds. Use this shape, and drop any section the data
 can't fill:
@@ -127,6 +219,16 @@ Growing fastest among the reels checked (views gained in their last day):
 1. <reel>: +<n> (from <a> on day <x> to <b> on day <y>)
 2. ...
 Not compared: <reels and why>.
+
+## @handle on X
+Followers: 1,204 on 2026-11-17, +3 from 1,201 on 2026-11-16.
+New: <postedAt>, "<first words>": <views> views, <likes> likes so far.
+Growing fastest (views gained in their last day):
+1. <post>: +<n> (from <a> on <date> to <b> on <date>)
+
+## @channel on Telegram
+Subscribers: 640 on 2026-11-17, +2 from 638 on 2026-11-16.
+...
 ```
 
 Start with the update itself, with no opener like "Here's your update". Write in
@@ -144,7 +246,8 @@ mention, say so in 1 line. A quiet day is a real answer.
   a trend, and don't give a verdict on a format or a label from 1 day.
 - Don't explain a change by a post's caption, hook, audio, thumbnail or posting
   time unless a tool returned something that supports it. You can't see the video.
-- If the account has no data yet, say so plainly and stop. Don't guess why, beyond
-  what a tool said, and don't promise when data will arrive.
+- If the Instagram account has no data yet, say so plainly, then still add X and
+  Telegram (section 5) unless the user asked about Instagram only. Don't guess why, beyond what a tool said, and don't
+  promise when data will arrive.
 - The tools only read. If the user asks you to change something, tell them where to
   do it in youreel rather than implying you did it.

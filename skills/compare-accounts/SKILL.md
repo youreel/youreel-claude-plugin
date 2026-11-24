@@ -10,8 +10,9 @@ description: >-
   wants a quick look at another account's profile, even if they don't say
   "compare". Use it with no handles only when they explicitly ask to compare
   against the accounts they already track in youreel. Needs the youreel
-  connector. Not for a report on the user's own account, and not for "how am I
-  growing compared with last week or last month" (use account-report).
+  connector. Not for a report on the user's own account or "how am I growing
+  compared with last week or last month" (use account-report), and not for X or
+  Telegram (use account-report, daily-update or post-audit).
 ---
 
 # Compare accounts
@@ -36,6 +37,14 @@ don't exist for other people's accounts, so they are never part of this.
 - **One handle and a question about that account only** ("what's @x like?",
   "how many followers does @x have?"): call `lookup_account` with that handle
   instead of running a comparison.
+
+- **An X handle or a Telegram channel:** `compare_accounts` and `lookup_account`
+  read Instagram only, so youreel can't compare X accounts or Telegram channels.
+  Say so. For the 1 X account and 1 Telegram channel the user monitors, the
+  daily update, the report and the audit (`daily-update`, `account-report`,
+  `post-audit`) cover how it's doing. Don't call the X or Telegram tools in this skill, and don't add
+  those accounts to the table, even when the user monitors them: X views,
+  Telegram views and Instagram numbers are each counted their own way.
 
 Handles passed to `compare_accounts` replace the tracked list for that call only.
 They don't add anything to the user's tracked accounts and use none of their

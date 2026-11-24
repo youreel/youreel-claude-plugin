@@ -1,23 +1,27 @@
 ---
 name: account-report
 description: >-
-  A weekly or monthly report on the user's own Instagram account from youreel:
-  follower change, posts published, reach, views, saves and shares against the
-  period before, the best and weakest post, and youreel's own insights. Use this
-  whenever the user asks for a weekly report, a monthly report, a recap, a
-  summary of how their Instagram did, "how did my account do this week/month",
-  "how am I growing compared with last week or last month", "what happened on my
-  Instagram lately", even if they don't say "report". Needs the youreel
-  connector. Not for comparing with other accounts they name (use
-  compare-accounts), for ranking reels (use reel-audit), or for what changed
-  since yesterday (use daily-update).
+  A weekly or monthly report from youreel on the user's Instagram and on the X
+  account and Telegram channel they monitor in youreel. Instagram: follower
+  change, posts published, reach, views, saves and shares against the period
+  before, the best and weakest post, and youreel's own insights. X and Telegram:
+  follower or subscriber change, posts published, and the best and weakest post.
+  Use this whenever the user asks for a weekly report, a monthly report, a recap,
+  a summary of how their Instagram, X or Telegram did, "how did my account do
+  this week/month", "how did my X do", "how many subscribers did my channel
+  gain", "which of my posts did best this week", "how am I growing compared with
+  last week or last month", even if they don't say "report". A question about a
+  period ("this week", "this month") belongs here. Needs the youreel connector.
+  Not for comparing with other accounts they name (use compare-accounts), for
+  ranking the last n reels or posts (use post-audit), or for what changed since
+  yesterday (use daily-update).
 ---
 
 # Account report
 
-A short, honest report on the user's own Instagram account, built only from what
-the youreel tools return. The reader is a creator who wants to know what moved and
-what to do next. A thin report with real numbers is a good outcome. A full report
+A short, honest report on the user's Instagram, and on the X account and Telegram
+channel they monitor in youreel, built only from what the youreel tools return.
+The reader is a creator who wants to know what moved and what to do next. A thin report with real numbers is a good outcome. A full report
 with 1 invented number is a bad one, because the creator can't tell which number
 is the invented one.
 
@@ -34,6 +38,10 @@ weeks. So a "monthly" report covers the last 28 days, not a calendar month. Say
 "the last 7 days" or "the last 4 weeks" in the report, never "this week", "October"
 or "this month", so the reader knows exactly which days the numbers cover. If the
 user asks for a specific calendar month, explain this and offer the last 4 weeks.
+
+**Networks.** By default the report covers Instagram, X and Telegram, each in its
+own section. If the user asks about 1 network ("how did my X do this week"),
+report only that one.
 
 ## 2. Read the definitions
 
@@ -53,11 +61,12 @@ no verdict.
    calendar date. A bare date starts at midnight UTC and pulls in posts from the
    bucket before. `limit: 50`. If `nextCursor` isn't null, call again with
    `cursor` set to it, and stop only when `nextCursor` is null.
-5. `get_content_detail` for the best and the weakest post (see step 4 below).
+5. `get_content_detail` for the best and the weakest post (see section 4).
    Pass each post's `id` as `contentId`.
 
-Use only these tools for this report. If a call fails, say which one and what is
-missing as a result, rather than filling the gap.
+Use only these tools for the Instagram part (section 5 adds the X and Telegram
+tools). If a call fails, say which one and what is missing as a result, rather
+than filling the gap.
 
 ## 4. Work out the numbers
 
@@ -112,7 +121,90 @@ the claim and name its `rule`. You may explain what the rule looks at. Don't ext
 the claim past what it says, and don't write your own insight from the raw numbers
 in its place. An empty list is a real answer: no rule had enough evidence yet.
 
-## 5. Write the report
+## 5. X and Telegram
+
+The same period, for the X account and the Telegram channel the user monitors in
+youreel.
+
+Call `get_x_account` and `get_telegram_channel` with no `handle` or `username`
+and `limit: 100`. If the user asked about 1 network, call only that one. Posts come newest first. Repeat with `offset` set to
+`nextOffset` until the oldest post returned is older than the period, or
+`nextOffset` is null.
+
+**When a call fails.**
+
+- `not-found`: the user doesn't monitor an account on that network. If they asked
+  about that network, say so, and that they add one on the monitor page in youreel.
+  You can't add it for them. Otherwise leave that network out without comment.
+- Anything else: 1 line naming the tool and quoting its sentence.
+
+**Fetch state.** Every result has `fetching` (`ok` or `stopped`) and `reason`.
+
+- `pending`, or no `profile` and an empty series: youreel hasn't read the
+  account yet. Say so in 1 line and skip that network.
+- Any other `stopped`: say so first, in plain words, with how fresh the numbers
+  are: the newest series date for followers or subscribers, and the newest
+  `latest.captured_at` for posts.
+  - X `not_found`: X has no account with that handle.
+  - X `unavailable`: the account is protected or suspended.
+  - X `limit_user` or `limit_global`: youreel's monthly budget for reading X is
+    used up, so post counts stopped updating. Fetching starts again by the 1st of
+    next month (UTC) at the latest. Followers can still update: check the series
+    dates before calling them old.
+  - Telegram `not_found`: there's no public channel with that username, or it's
+    private.
+  - Telegram `session_missing`, `session_dead` or `flood`: a problem on youreel's
+    side. The user can't fix it and doesn't need to do anything.
+  - `error` on either network: youreel couldn't read it last time. Don't guess
+    why.
+
+**Reading the posts.**
+
+- Name a post by its `postedAt` date and the first words of `text`. X posts have
+  no link. A Telegram post's `text` can be empty: use its `url`, or only the date
+  when `url` is null.
+- X posts include the account's replies to other people, and the tool doesn't
+  mark which ones are replies. Say "posts and replies" when you count or rank
+  them. Reposts of other people's posts aren't included.
+- youreel refreshes an X post's counts for 5 days after it's posted. Older posts
+  keep their last counts: say "as of" their `latest.captured_at` date, and don't
+  measure growth on them.
+- Telegram `likes` is all reactions added together. `comments` null means
+  youreel has no comment count for that post. It isn't 0. If every post is null,
+  the channel has no comments section.
+- A `null` count, or a `null` `latest`, wasn't recorded. Write "not recorded",
+  never 0.
+
+**Wording.** Write about X and Telegram the way you write about Instagram, each
+network in its own section. youreel doesn't check who owns a monitored account,
+so say "your" only when the user calls it theirs. Otherwise name it: "@handle on
+X", "@channel on Telegram". Never mix networks in 1 table or ranking: X views
+are impressions as X counts them, Telegram views are Telegram's own count, and
+Instagram reach is a different measure again.
+
+**The numbers, for each network.**
+
+- **Followers (X) or subscribers (Telegram).** From `followerSeries` or
+  `subscriberSeries` (1 reading per UTC day, the last one that day), take the
+  newest point and the newest point on or before the start of the period, with
+  both dates and the difference. It's a net change, as on Instagram. History
+  starts the day youreel first read the account. If no point is that old, say
+  the history doesn't reach back that far yet.
+- **Published in the period**: how many posts (on X, posts and replies), by
+  `postedAt`. On Telegram, also give the count for the period before: youreel
+  reads 3 months of posts. On X, don't: youreel's first read reached back only up
+  to 30 days, so the period before can be incomplete. Don't add up views across
+  posts on either network: newer posts have had less time, and X posts stop
+  updating after 5 days, so the totals wouldn't line up.
+- **Best and weakest by views**, each with its other counts. X: likes, reposts,
+  replies, quotes, bookmarks. Telegram: forwards, likes, comments. Leave out
+  posts without `views` and say how many. With fewer than 3 posts that have
+  views, list them instead and say it's too early to tell. In a 7-day period the
+  newest posts have had less time: say so when it affects which post is best.
+- **Not available** for X or Telegram: reach, saves, youreel's insights and who
+  follows or subscribes. If the user asks, say youreel doesn't have them there.
+
+## 6. Write the report
 
 Keep it readable in under a minute. Use this shape, and drop any section the data
 can't fill rather than padding it:
@@ -137,6 +229,18 @@ What youreel noticed:
 - <claim> (rule: <rule>)
 
 Next step: <1 step, and the number it rests on>
+
+## @handle on X
+Followers: 1,204 on 2026-11-16, up 18 from 1,186 on 2026-11-09.
+Posts and replies published: 6.
+Best post by views: 2026-11-12, "<first words>", 3,410 views, 52 likes (as of 2026-11-16).
+Weakest post by views: ...
+
+## @channel on Telegram
+Subscribers: ...
+Posts published: ...
+Best post by views: ...
+Weakest post by views: ...
 ```
 
 Write in plain, direct second person ("you posted 4 times"). Say "not recorded" for
@@ -160,6 +264,7 @@ supports it, and name what it rests on. If nothing supports one, leave it out.
 - The tools only read. If the user asks you to change something, tell them where to
   do it in youreel rather than implying you did it.
 - If the account has no posts in the period, or the tools say there's no connected
-  account, say so plainly and stop. Don't build a report from other periods to fill
-  the space, don't guess why the data is missing beyond what a tool said, and don't
-  promise when more data will arrive.
+  account, say so plainly and stop the Instagram part. Still add X and Telegram
+  (section 5) unless the user asked about Instagram only. Don't build a report from other periods to fill the space, don't
+  guess why the data is missing beyond what a tool said, and don't promise when
+  more data will arrive.
