@@ -2,18 +2,16 @@
 name: post-audit
 description: >-
   Audit the user's last n Instagram reels, or the last n posts from the X
-  account or Telegram channel they monitor in youreel, and say which ones worked
-  better and on which numbers. Reels: reach, skip rate, share rate and save
-  rate, and, where youreel returned one, each reel against the median of the
-  account's other recent reels. X posts: views, likes, reposts and replies.
-  Telegram posts: views, forwards and reactions. Use this whenever the user asks
-  to audit, review, rank or compare their recent reels or posts, asks "which of
-  my last 10 reels did best", "which of my X posts worked", "what worked on my
-  Telegram channel", "why are my reels flopping", or names a number of reels or
-  posts to look at, even if they don't say "audit". Needs the youreel connector.
-  A question about the last n posts belongs here. Not for a report on a period
-  like "this week" (use account-report), for which reel or post grew most since
-  yesterday (use daily-update), or for other people's Instagram accounts (use
+  account or Telegram channel they monitor, and say which worked better and on
+  which numbers. Reels: reach, skip, share and save rate, and each reel against
+  the median of the account's other recent reels where youreel returned one. X:
+  views, likes, reposts, replies. Telegram: views, forwards, reactions. Use this
+  whenever the user asks to audit, review, rank or compare their recent reels or
+  posts, "which of my last 10 reels did best", "which of my X posts worked",
+  "why are my reels flopping", or names a number of posts to look at, even if
+  they don't say "audit". Needs the youreel connector. Not for a report on a
+  period like "this week" (use account-report), which post grew most since
+  yesterday (use daily-update), or other people's Instagram accounts (use
   compare-accounts).
 ---
 

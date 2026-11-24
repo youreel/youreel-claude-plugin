@@ -1,19 +1,17 @@
 ---
 name: account-report
 description: >-
-  A weekly or monthly report from youreel on the user's Instagram and on the X
-  account and Telegram channel they monitor in youreel. Instagram: follower
-  change, posts published, reach, views, saves and shares against the period
-  before, the best and weakest post, and youreel's own insights. X and Telegram:
-  follower or subscriber change, posts published, and the best and weakest post.
-  Use this whenever the user asks for a weekly report, a monthly report, a recap,
-  a summary of how their Instagram, X or Telegram did, "how did my account do
-  this week/month", "how did my X do", "how many subscribers did my channel
-  gain", "which of my posts did best this week", "how am I growing compared with
-  last week or last month", even if they don't say "report". A question about a
-  period ("this week", "this month") belongs here. Needs the youreel connector.
-  Not for comparing with other accounts they name (use compare-accounts), for
-  ranking the last n reels or posts (use post-audit), or for what changed since
+  A weekly or monthly report from youreel on the user's Instagram and the X
+  account and Telegram channel they monitor. Instagram: follower change, posts,
+  reach, views, saves and shares against the period before, best and weakest
+  post, and youreel's insights. X and Telegram: follower or subscriber change,
+  posts, and best and weakest post. Use this whenever the user asks for a weekly
+  or monthly report, a recap, "how did my account do this week/month", "how did
+  my X do", "how many subscribers did my channel gain", "which of my posts did
+  best this week", or "how am I growing compared with last week", even if they
+  don't say "report". Questions about a period belong here. Needs the youreel
+  connector. Not for comparing with accounts they name (use compare-accounts),
+  ranking the last n reels or posts (use post-audit), or what changed since
   yesterday (use daily-update).
 ---
 
